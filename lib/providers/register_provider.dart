@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
+import '../constant.dart';
 
 // Définition de l'état possible de l'inscription
 class AuthState {
@@ -28,7 +29,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     try {
       final dio = Dio();
       final response = await dio.post(
-        'https://1dbe-154-0-185-15.ngrok-free.app/api/users', // Remplacer avec votre URL
+        registerURL, // Remplacer avec votre URL
         data: {
           'name': name,
           'role': 'Boutique',

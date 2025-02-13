@@ -73,7 +73,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
           .register(name, email, password, passwordConfirmation)
           .then((_) {
         // Inscription réussie, redirection vers la page d'accueil
-        context.go('/home');
+        context.go('/login');
       }).catchError((error) {
         // Gérer l'erreur si l'inscription échoue
         ScaffoldMessenger.of(context).showSnackBar(

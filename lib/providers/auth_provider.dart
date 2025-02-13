@@ -1,25 +1,30 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../constant.dart';
 
-// API Base URL (à modifier selon ton backend)
-const String apiUrl =
-    "https://1dbe-154-0-185-15.ngrok-free.app/api"; // Remplace par ton URL
+// API Base URL
+const String apiUrl = loginURL;
 
-// Provider pour gérer l'authentification
+// Stockage sécurisé
+const FlutterSecureStorage _secureStorage = FlutterSecureStorage();
+
+// Provider d'authentification
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>(
   (ref) => AuthNotifier(),
 );
 
-// Classe pour gérer l'état de l'authentification
+// Classe pour l'état de l'authentification
 class AuthState {
   final bool isLoading;
   final String? token;
   final String? error;
+  final int? userId;
 
-  AuthState({this.isLoading = false, this.token, this.error});
+  AuthState({this.isLoading = false, this.token, this.error, this.userId});
 }
 
-// Classe pour gérer les appels API
+// Classe pour gérer l'authentification
 class AuthNotifier extends StateNotifier<AuthState> {
   AuthNotifier() : super(AuthState());
 
@@ -29,15 +34,34 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
     try {
       final response = await Dio().post(
-        '$apiUrl/login', // Route de ton API Laravel
+        loginURL,
         data: {'email': email, 'password': password},
       );
 
+      // Récupérer les données utilisateur
       final String token = response.data['token'];
-      state =
-          AuthState(token: token); // Stocke le token après connexion réussie
+      final int userId = response.data['user']['id'];
+
+      // Stocker le token de manière sécurisée
+      await _secureStorage.write(key: "auth_token", value: token);
+      await _secureStorage.write(key: "user_id", value: userId.toString());
+
+      // Mettre à jour l'état avec token et userId
+      state = AuthState(token: token, userId: userId);
+    } on DioException catch (e) {
+      String errorMessage = "Une erreur est survenue";
+      if (e.response != null) {
+        errorMessage = e.response?.data['message'] ?? "Erreur inconnue";
+      }
+      state = AuthState(error: errorMessage);
     } catch (e) {
-      state = AuthState(error: "Email ou mot de passe incorrect");
+      state = AuthState(error: "Erreur: $e");
     }
+  }
+
+  // Récupérer l'ID utilisateur stocké
+  Future<int?> getUserId() async {
+    final userIdStr = await _secureStorage.read(key: "user_id");
+    return userIdStr != null ? int.tryParse(userIdStr) : null;
   }
 }
