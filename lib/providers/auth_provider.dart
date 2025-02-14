@@ -2,6 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../constant.dart';
+import 'package:go_router/go_router.dart'; // Import GoRouter
+import 'package:flutter/material.dart';
 
 // API Base URL
 const String apiUrl = loginURL;
@@ -29,7 +31,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
   AuthNotifier() : super(AuthState());
 
   // Fonction de connexion
-  Future<void> login(String email, String password) async {
+  Future<void> login(
+      String email, String password, BuildContext context) async {
     state = AuthState(isLoading: true); // Active le loading
 
     try {
@@ -48,6 +51,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
       // Mettre à jour l'état avec token et userId
       state = AuthState(token: token, userId: userId);
+
+      // Vérifier la boutique et rediriger
+      await checkAndRedirect(userId, token, context);
     } on DioException catch (e) {
       String errorMessage = "Une erreur est survenue";
       if (e.response != null) {
@@ -63,5 +69,32 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<int?> getUserId() async {
     final userIdStr = await _secureStorage.read(key: "user_id");
     return userIdStr != null ? int.tryParse(userIdStr) : null;
+  }
+
+  // Vérifier si l'utilisateur a une boutique et le rediriger
+  Future<void> checkAndRedirect(
+      int userId, String token, BuildContext context) async {
+    try {
+      final response = await Dio().get(
+        "$baseURL/check-shop/$userId",
+        options: Options(
+          headers: {"Authorization": "Bearer $token"},
+        ),
+      );
+
+      bool hasShop = response.data[
+          'hasShop']; // Suppose que l'API retourne { "hasShop": true/false }
+
+      if (hasShop) {
+        GoRouter.of(context).go('/home'); // Rediriger vers /home
+      } else {
+        GoRouter.of(context)
+            .go('/create-boutique'); // Rediriger vers création de boutique
+      }
+    } catch (e) {
+      debugPrint("Erreur lors de la vérification de la boutique: $e");
+      GoRouter.of(context)
+          .go('/create-shop'); // En cas d'erreur, rediriger vers /create-shop
+    }
   }
 }

@@ -40,23 +40,23 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   Future<void> _submitForm() async {
     if (_formKey.currentState?.validate() ?? false) {
       final auth = ref.read(authProvider.notifier);
-      await auth.login(_emailController.text, _passwordController.text);
+      await auth.login(
+          _emailController.text, _passwordController.text, context);
 
-      final authState = ref.read(authProvider);
-      if (authState.token != null) {
-        context.go('/home'); // Redirige vers la page d'accueil après connexion
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(authState.error ?? 'Une erreur est survenue')),
-        );
-      }
+      // final authState = ref.read(authProvider);
+      // if (authState.token != null) {
+      //   context.go('/home'); // Redirige vers la page d'accueil après connexion
+      // } else {
+      //   ScaffoldMessenger.of(context).showSnackBar(
+      //     SnackBar(content: Text(authState.error ?? 'Une erreur est survenue')),
+      //   );
+      // }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
-
     return Scaffold(
       appBar: AppBar(title: Text('Connexion')),
       body: Padding(

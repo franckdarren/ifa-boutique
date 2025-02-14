@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'screens/auth/login_page.dart';
 import 'screens/auth/register_page.dart';
 import 'screens/home_page.dart';
+import 'screens/boutique/create_boutique_page.dart';
 
 void main() {
   runApp(const ProviderScope(child: MyApp())); // ⬅️ ProviderScope ajouté ici
@@ -20,6 +21,9 @@ class MyApp extends StatelessWidget {
         GoRoute(path: '/login', builder: (context, state) => LoginPage()),
         GoRoute(path: '/register', builder: (context, state) => RegisterPage()),
         GoRoute(path: '/home', builder: (context, state) => MyHomePage()),
+        GoRoute(
+            path: '/create-boutique',
+            builder: (context, state) => CreateBoutiquePage()),
       ],
     );
 
