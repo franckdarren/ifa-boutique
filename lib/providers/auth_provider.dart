@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../constant.dart';
-import 'package:go_router/go_router.dart'; // Import GoRouter
+import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 
 // API Base URL
@@ -33,7 +33,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   // Fonction de connexion
   Future<void> login(
       String email, String password, BuildContext context) async {
-    state = AuthState(isLoading: true); // Active le loading
+    state = AuthState(isLoading: true); // Active le chargement
 
     try {
       final response = await Dio().post(
@@ -57,11 +57,23 @@ class AuthNotifier extends StateNotifier<AuthState> {
     } on DioException catch (e) {
       String errorMessage = "Une erreur est survenue";
       if (e.response != null) {
-        errorMessage = e.response?.data['message'] ?? "Erreur inconnue";
+        // Si le status code est 401, on considère que c'est une erreur d'email ou de mot de passe
+        if (e.response!.statusCode == 401) {
+          errorMessage = "Email ou mot de passe incorrect";
+        } else {
+          errorMessage = e.response?.data['message'] ?? "Erreur inconnue";
+        }
       }
       state = AuthState(error: errorMessage);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errorMessage)),
+      );
     } catch (e) {
-      state = AuthState(error: "Erreur: $e");
+      final errorMessage = "Erreur: $e";
+      state = AuthState(error: errorMessage);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errorMessage)),
+      );
     }
   }
 
@@ -82,19 +94,16 @@ class AuthNotifier extends StateNotifier<AuthState> {
         ),
       );
 
-      bool hasShop = response.data[
-          'hasShop']; // Suppose que l'API retourne { "hasShop": true/false }
+      bool hasShop = response.data['hasShop'];
 
       if (hasShop) {
-        GoRouter.of(context).go('/home'); // Rediriger vers /home
+        GoRouter.of(context).go('/home');
       } else {
-        GoRouter.of(context)
-            .go('/create-boutique'); // Rediriger vers création de boutique
+        GoRouter.of(context).go('/create-boutique');
       }
     } catch (e) {
       debugPrint("Erreur lors de la vérification de la boutique: $e");
-      GoRouter.of(context)
-          .go('/create-shop'); // En cas d'erreur, rediriger vers /create-shop
+      GoRouter.of(context).go('/create-boutique');
     }
   }
 }

@@ -31,7 +31,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       return 'Veuillez entrer un mot de passe';
     }
     if (value.length < 6) {
-      return 'Le mot de passe doit contenir au moins 6 caractères';
+      return 'Il faut au moins 6 caractères';
     }
     return null;
   }

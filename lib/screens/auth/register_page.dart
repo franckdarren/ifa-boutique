@@ -114,7 +114,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                           border: OutlineInputBorder(),
                           prefixIcon: Icon(Icons.person),
                         ),
-                        keyboardType: TextInputType.emailAddress,
+                        keyboardType: TextInputType.text,
                         validator: _validateName,
                       ),
                       SizedBox(height: 20),
