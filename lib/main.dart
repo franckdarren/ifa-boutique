@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final GoRouter _router = GoRouter(
-      initialLocation: '/login',
+      initialLocation: '/home',
       routes: [
         GoRoute(path: '/login', builder: (context, state) => LoginPage()),
         GoRoute(path: '/register', builder: (context, state) => RegisterPage()),

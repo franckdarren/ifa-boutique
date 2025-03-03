@@ -169,6 +169,7 @@ class _CreateBoutiquePageState extends ConsumerState<CreateBoutiquePage> {
                 child: Column(
                   children: [
                     // Champ Nom
+                    const SizedBox(height: 20),
                     TextFormField(
                       controller: _nomController,
                       decoration: const InputDecoration(
@@ -177,7 +178,7 @@ class _CreateBoutiquePageState extends ConsumerState<CreateBoutiquePage> {
                       ),
                       validator: _validateNom,
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 20),
                     // Champ Adresse
                     TextFormField(
                       controller: _adresseController,
@@ -187,7 +188,7 @@ class _CreateBoutiquePageState extends ConsumerState<CreateBoutiquePage> {
                       ),
                       validator: _validateAdresse,
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 20),
                     // Champ Téléphone
                     TextFormField(
                       controller: _phoneController,
@@ -198,7 +199,7 @@ class _CreateBoutiquePageState extends ConsumerState<CreateBoutiquePage> {
                       keyboardType: TextInputType.phone,
                       validator: _validatePhone,
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 20),
                     // Champ Description
                     TextFormField(
                       controller: _descriptionController,
@@ -208,7 +209,7 @@ class _CreateBoutiquePageState extends ConsumerState<CreateBoutiquePage> {
                       ),
                       validator: _validateDescription,
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 20),
                     // Champ Heure d'ouverture
                     TextFormField(
                       controller: _heureOuvertureController,
@@ -218,7 +219,7 @@ class _CreateBoutiquePageState extends ConsumerState<CreateBoutiquePage> {
                       ),
                       validator: _validateHeureOuverture,
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 20),
                     // Champ Heure de fermeture
                     TextFormField(
                       controller: _heureFermetureController,
@@ -228,7 +229,7 @@ class _CreateBoutiquePageState extends ConsumerState<CreateBoutiquePage> {
                       ),
                       validator: _validateHeureFermeture,
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 20),
                     // Sélecteur d'image pour le logo
                     GestureDetector(
                       onTap: _pickImage,
@@ -245,7 +246,7 @@ class _CreateBoutiquePageState extends ConsumerState<CreateBoutiquePage> {
                                 size: 50, color: Colors.grey),
                       ),
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: _pickImage,
                       child: const Text('Sélectionner une image'),

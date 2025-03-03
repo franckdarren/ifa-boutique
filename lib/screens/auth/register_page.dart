@@ -77,7 +77,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
       }).catchError((error) {
         // Gérer l'erreur si l'inscription échoue
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erreur d\'inscription : $error')),
+          SnackBar(content: Text('Erreur lors de l\'inscription : $error')),
         );
       });
     }
@@ -89,7 +89,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
         authProvider); // Utilisation de 'ref.watch' pour accéder à l'état
 
     return Scaffold(
-      appBar: AppBar(title: Text('Page d\'Inscription')),
+      // appBar: AppBar(title: Text('Page d\'Inscription')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Center(

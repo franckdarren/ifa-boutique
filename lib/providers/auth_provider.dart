@@ -55,7 +55,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
       // Vérifier la boutique et rediriger
       await checkAndRedirect(userId, token, context);
     } on DioException catch (e) {
-      String errorMessage = "Une erreur est survenue";
+      String errorMessage =
+          "Une erreur est survenue. Veuillez vous connectez à internet";
       if (e.response != null) {
         // Si le status code est 401, on considère que c'est une erreur d'email ou de mot de passe
         if (e.response!.statusCode == 401) {
@@ -103,7 +104,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       }
     } catch (e) {
       debugPrint("Erreur lors de la vérification de la boutique: $e");
-      GoRouter.of(context).go('/create-boutique');
+      GoRouter.of(context).go('/login');
     }
   }
 }

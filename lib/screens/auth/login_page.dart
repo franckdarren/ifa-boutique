@@ -30,8 +30,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     if (value == null || value.isEmpty) {
       return 'Veuillez entrer un mot de passe';
     }
-    if (value.length < 6) {
-      return 'Il faut au moins 6 caractères';
+    if (value.length < 8) {
+      return 'Il faut au moins 8 caractères';
     }
     return null;
   }
@@ -58,7 +58,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
     return Scaffold(
-      appBar: AppBar(title: Text('Connexion')),
+      // appBar: AppBar(title: Text('Connexion')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Center(

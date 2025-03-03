@@ -38,7 +38,7 @@ class Boutique {
 
   factory Boutique.fromJson(Map<String, dynamic> json) {
     // Imprimer les données pour vérification
-    debugPrint("Données reçues : $json");
+    // debugPrint("Données reçues : $json");
 
     return Boutique(
       id: json['id'] as int?, // id peut être nul
