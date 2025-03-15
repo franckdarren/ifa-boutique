@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart'; // Import de Riverpod
 import 'package:go_router/go_router.dart';
+import 'package:ifa_boutique/pages/article/mes_articles_page.dart';
+import 'package:ifa_boutique/pages/commande/mes_commandes_page.dart';
+import 'package:ifa_boutique/pages/profil/mon_profil_page.dart';
 import 'pages/auth/login_page.dart';
 import 'pages/auth/register_page.dart';
 import 'pages/home_page.dart';
@@ -28,6 +31,14 @@ class MyApp extends StatelessWidget {
         GoRoute(
             path: '/create-article',
             builder: (context, state) => CreateArticlePage()),
+        GoRoute(
+            path: '/mes-articles',
+            builder: (context, state) => MesArticlesPage()),
+        GoRoute(
+            path: '/mes-commandes',
+            builder: (context, state) => MesCommandesPage()),
+        GoRoute(
+            path: '/mon-profil', builder: (context, state) => MonProfilPage()),
       ],
     );
 
