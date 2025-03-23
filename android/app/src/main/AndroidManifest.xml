@@ -44,6 +44,9 @@
     <!-- Permissions pour URL Launcher -->
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"/>
 
+    <!-- Permissions pour les requettes vers l'API -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and
