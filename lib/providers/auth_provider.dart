@@ -4,6 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../constant.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
+import '../models/user_model.dart';
 
 // API Base URL
 const String apiUrl = loginURL;
@@ -22,8 +23,15 @@ class AuthState {
   final String? token;
   final String? error;
   final int? userId;
+  final User? user;
 
-  AuthState({this.isLoading = false, this.token, this.error, this.userId});
+  AuthState({
+    this.isLoading = false,
+    this.token,
+    this.error,
+    this.userId,
+    this.user,
+  });
 }
 
 // Classe pour gérer l'authentification
@@ -45,12 +53,19 @@ class AuthNotifier extends StateNotifier<AuthState> {
       final String token = response.data['token'];
       final int userId = response.data['user']['id'];
 
+      final Map<String, dynamic> userJson = response.data['user'];
+      final User user = User.fromJson(userJson);
+
       // Stocker le token de manière sécurisée
       await _secureStorage.write(key: "auth_token", value: token);
       await _secureStorage.write(key: "user_id", value: userId.toString());
 
       // Mettre à jour l'état avec token et userId
-      state = AuthState(token: token, userId: userId);
+      state = AuthState(
+        token: token,
+        userId: userId,
+        user: user,
+      );
 
       // Vérifier la boutique et rediriger
       await checkAndRedirect(userId, token, context);

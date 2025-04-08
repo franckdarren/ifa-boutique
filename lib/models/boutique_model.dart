@@ -10,6 +10,7 @@ class Boutique {
   final String heureFermeture;
   final String description;
   final int userId;
+  final int solde;
 
   Boutique({
     this.id,
@@ -21,6 +22,7 @@ class Boutique {
     required this.heureFermeture,
     required this.description,
     required this.userId,
+    this.solde = 0,
   });
 
   // Fonction statique pour convertir une chaîne en entier si possible, sinon retourne 0
@@ -50,6 +52,7 @@ class Boutique {
       heureFermeture: _parseString(json['heure_fermeture']),
       description: _parseString(json['description']),
       userId: _parseInt(json['user_id']),
+      solde: json['solde'] ?? 0,
     );
   }
 
@@ -64,6 +67,7 @@ class Boutique {
       'heure_fermeture': heureFermeture,
       'description': description,
       'user_id': userId,
+      'solde': solde,
     };
   }
 }
