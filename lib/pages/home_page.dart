@@ -76,11 +76,13 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       drawer: Drawer(
         child: ListView(
           children: [
-            const DrawerHeader(
+            DrawerHeader(
               child: Center(
-                child: CircleAvatar(
-                  radius: 50,
-                  backgroundImage: AssetImage('lib/images/img1.jpg'),
+                child: Image.asset(
+                  'lib/images/logo1.png',
+                  width: 150,
+                  height: 150,
+                  fit: BoxFit.cover,
                 ),
               ),
             ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../providers/auth_provider.dart';
+import '../../constant.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   @override
@@ -66,9 +67,19 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                Image.asset(
+                  'lib/images/logo1.png',
+                  width: 200,
+                  height: 200,
+                  fit: BoxFit.cover,
+                ),
+                SizedBox(height: 30),
                 Text(
-                  'Connexion',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  'Connectez-vous',
+                  style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w600,
+                      color: couleurPrimaire),
                 ),
                 SizedBox(height: 30),
                 Form(
@@ -99,14 +110,72 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       SizedBox(height: 30),
                       ElevatedButton(
                         onPressed: authState.isLoading ? null : _submitForm,
-                        child: authState.isLoading
-                            ? CircularProgressIndicator()
-                            : Text('Se connecter',
-                                style: TextStyle(fontSize: 16)),
                         style: ElevatedButton.styleFrom(
+                          backgroundColor: couleurPrimaire,
+                          foregroundColor:
+                              Colors.white, // 🔵 couleur du texte / icône
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(12), // 🎯 arrondi
+                          ),
                           padding: EdgeInsets.symmetric(vertical: 15),
                           minimumSize: Size(double.infinity, 50),
                         ),
+                        child: authState.isLoading
+                            ? SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white, // 👈 couleur du loader
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : Text(
+                                'Se connecter',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                      ),
+                      SizedBox(height: 30),
+                      Text(
+                        'Se connecter avec :',
+                        style: TextStyle(fontSize: 16, color: couleurPrimaire),
+                      ),
+                      SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // Bouton Google
+                          InkWell(
+                            onTap: () {
+                              // Action pour Google
+                            },
+                            child: CircleAvatar(
+                              backgroundColor: Colors.white,
+                              radius: 25,
+                              child: Image.asset(
+                                'lib/images/google.png',
+                                width: 30,
+                                height: 30,
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 20),
+                          // Bouton Facebook
+                          InkWell(
+                            onTap: () {
+                              // Action pour Facebook
+                            },
+                            child: CircleAvatar(
+                              backgroundColor: Color(0xFF1877F2),
+                              radius: 25,
+                              child: Image.asset(
+                                'lib/images/facebook.png',
+                                width: 30,
+                                height: 30,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -115,8 +184,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 TextButton(
                   onPressed: () => context.go('/register'),
                   child: Text('Créer un compte',
-                      style: TextStyle(color: Colors.blue)),
+                      style: TextStyle(color: couleurPrimaire, fontSize: 16)),
                 ),
+                SizedBox(height: 20),
               ],
             ),
           ),

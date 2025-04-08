@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../providers/register_provider.dart'; // Importer le fichier avec le provider
+import '../../constant.dart';
 
 class RegisterPage extends ConsumerStatefulWidget {
   @override
@@ -97,9 +98,19 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                Image.asset(
+                  'lib/images/logo1.png',
+                  width: 200,
+                  height: 200,
+                  fit: BoxFit.cover,
+                ),
+                SizedBox(height: 30),
                 Text(
-                  'Créer un Compte',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  'Créer un compte',
+                  style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w600,
+                      color: couleurPrimaire),
                 ),
                 SizedBox(height: 30),
                 Form(
@@ -163,14 +174,21 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                         onPressed: authState.isLoading
                             ? null
                             : _submitForm, // Désactive le bouton en cas de chargement
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: couleurPrimaire,
+                          foregroundColor:
+                              Colors.white, // 🔵 couleur du texte / icône
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(12), // 🎯 arrondi
+                          ),
+                          padding: EdgeInsets.symmetric(vertical: 15),
+                          minimumSize: Size(double.infinity, 50),
+                        ),
                         child: authState.isLoading
                             ? CircularProgressIndicator() // Afficher un loader pendant la requête
                             : Text('S\'inscrire',
                                 style: TextStyle(fontSize: 16)),
-                        style: ElevatedButton.styleFrom(
-                          padding: EdgeInsets.symmetric(vertical: 15),
-                          minimumSize: Size(double.infinity, 50),
-                        ),
                       ),
                       if (authState.errorMessage != null)
                         Padding(
@@ -190,7 +208,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                     context.go('/login');
                   },
                   child: Text('Déjà un compte ? Se connecter',
-                      style: TextStyle(color: Colors.blue)),
+                      style: TextStyle(color: couleurPrimaire, fontSize: 16)),
                 ),
               ],
             ),
