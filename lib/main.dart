@@ -9,6 +9,7 @@ import 'pages/auth/register_page.dart';
 import 'pages/home_page.dart';
 import 'pages/boutique/create_boutique_page.dart';
 import 'pages/article/create_article_page.dart';
+import '../../constant.dart';
 
 void main() {
   runApp(const ProviderScope(child: MyApp())); // ⬅️ ProviderScope ajouté ici
@@ -20,7 +21,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final GoRouter _router = GoRouter(
-      initialLocation: '/login',
+      initialLocation: '/home',
       routes: [
         GoRoute(path: '/login', builder: (context, state) => LoginPage()),
         GoRoute(path: '/register', builder: (context, state) => RegisterPage()),
@@ -47,7 +48,8 @@ class MyApp extends StatelessWidget {
       title: 'IFA Boutique',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(
+            seedColor: couleurPrimaire, primary: couleurPrimaire),
         useMaterial3: true,
       ),
     );

@@ -6,6 +6,7 @@ import 'package:ifa_boutique/pages/dashboard_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/auth_provider.dart'; // Assure-toi que le chemin est correct
+import '../../constant.dart';
 
 class MyHomePage extends ConsumerStatefulWidget {
   @override
@@ -47,11 +48,20 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text("Accueil"),
+        iconTheme: IconThemeData(
+          color: Colors.white, // 🎯 Couleur de l'icône du Drawer
+        ),
+        backgroundColor: couleurPrimaire,
+        title: const Text(
+          "Ewuang",
+          style: TextStyle(color: Colors.white),
+        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.add),
+            icon: const Icon(
+              Icons.add,
+              color: Colors.white,
+            ),
             onPressed: () {
               context.push('/create-article');
             },
