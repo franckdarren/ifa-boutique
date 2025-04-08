@@ -4,14 +4,17 @@ import 'package:ifa_boutique/pages/article/mes_articles_page.dart';
 import 'package:ifa_boutique/pages/commande/mes_commandes_page.dart';
 import 'package:ifa_boutique/pages/dashboard_page.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/auth_provider.dart'; // Assure-toi que le chemin est correct
 
-class MyHomePage extends StatefulWidget {
+class MyHomePage extends ConsumerStatefulWidget {
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  ConsumerState<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends ConsumerState<MyHomePage> {
   int _selectedIndex = 0;
+
   void _navigateBottomBar(int index) {
     setState(() {
       _selectedIndex = index;
@@ -24,11 +27,14 @@ class _MyHomePageState extends State<MyHomePage> {
     MesCommandesPage(),
   ];
 
-  // Lanceur vers whatsapp
-  Future<void> openWhatsApp(
-      {required String phoneNumber, String message = ''}) async {
+  // Lanceur vers WhatsApp
+  Future<void> openWhatsApp({
+    required String phoneNumber,
+    String message = '',
+  }) async {
     final Uri url = Uri.parse(
-        'https://wa.me/$phoneNumber?text=${Uri.encodeComponent(message)}');
+      'https://wa.me/$phoneNumber?text=${Uri.encodeComponent(message)}',
+    );
 
     if (await canLaunchUrl(url)) {
       await launchUrl(url, mode: LaunchMode.externalApplication);
@@ -42,34 +48,35 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text("Acceuil"),
+        title: const Text("Accueil"),
         actions: [
           IconButton(
-              icon: Icon(Icons.add),
-              onPressed: () {
-                context.push('/create-article');
-              }),
-          // IconButton(icon: Icon(Icons.notifications), onPressed: () {})
+            icon: const Icon(Icons.add),
+            onPressed: () {
+              context.push('/create-article');
+            },
+          ),
         ],
       ),
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
-          elevation: 10,
-          currentIndex: _selectedIndex,
-          onTap: _navigateBottomBar,
-          type: BottomNavigationBarType.fixed,
-          items: [
-            BottomNavigationBarItem(
-                icon: Icon(Icons.bar_chart_outlined), label: 'Accueil'),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.shopping_bag), label: 'Articles'),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.mobile_friendly_rounded), label: 'Ventes'),
-          ]),
+        elevation: 10,
+        currentIndex: _selectedIndex,
+        onTap: _navigateBottomBar,
+        type: BottomNavigationBarType.fixed,
+        items: const [
+          BottomNavigationBarItem(
+              icon: Icon(Icons.bar_chart_outlined), label: 'Accueil'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.shopping_bag), label: 'Articles'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.mobile_friendly_rounded), label: 'Ventes'),
+        ],
+      ),
       drawer: Drawer(
         child: ListView(
           children: [
-            DrawerHeader(
+            const DrawerHeader(
               child: Center(
                 child: CircleAvatar(
                   radius: 50,
@@ -78,49 +85,43 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
             ListTile(
-              title: Text(
+              title: const Text(
                 'Mon compte',
-                style: TextStyle(
-                  fontSize: 18,
-                ),
+                style: TextStyle(fontSize: 18),
               ),
-              trailing: Icon(Icons.arrow_right),
-              leading: Icon(Icons.person),
+              trailing: const Icon(Icons.arrow_right),
+              leading: const Icon(Icons.person),
               onTap: () {
                 Navigator.of(context).pop();
                 context.push('/mon-profil');
               },
             ),
-            Divider(),
+            const Divider(),
             ListTile(
-              title: Text(
+              title: const Text(
                 'Nous contacter',
-                style: TextStyle(
-                  fontSize: 18,
-                ),
+                style: TextStyle(fontSize: 18),
               ),
-              trailing: Icon(Icons.arrow_right),
-              leading: Icon(Icons.call),
+              trailing: const Icon(Icons.arrow_right),
+              leading: const Icon(Icons.call),
               onTap: () {
                 openWhatsApp(phoneNumber: '24102704750', message: 'Bonjour !');
               },
             ),
-            Divider(),
+            const Divider(),
             ListTile(
-              title: Text(
+              title: const Text(
                 'Se déconnecter',
-                style: TextStyle(
-                  fontSize: 18,
-                ),
+                style: TextStyle(fontSize: 18),
               ),
-              trailing: Icon(Icons.arrow_right),
-              leading: Icon(Icons.output_rounded),
+              trailing: const Icon(Icons.arrow_right),
+              leading: const Icon(Icons.output_rounded),
               onTap: () {
                 Navigator.of(context).pop();
-                context.push('/mon-profil');
+                ref.read(authProvider.notifier).logout(context);
               },
             ),
-            Divider(),
+            const Divider(),
           ],
         ),
       ),

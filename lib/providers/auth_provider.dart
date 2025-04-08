@@ -78,6 +78,26 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  // Méthode de déconnexion
+  Future<void> logout(BuildContext context) async {
+    try {
+      // Supprimer les données du stockage sécurisé
+      await _secureStorage.delete(key: "auth_token");
+      await _secureStorage.delete(key: "user_id");
+
+      // Réinitialiser l'état
+      state = AuthState();
+
+      // Rediriger vers la page de connexion
+      GoRouter.of(context).go('/login');
+    } catch (e) {
+      debugPrint("Erreur lors de la déconnexion : $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Erreur lors de la déconnexion")),
+      );
+    }
+  }
+
   // Récupérer l'ID utilisateur stocké
   Future<int?> getUserId() async {
     final userIdStr = await _secureStorage.read(key: "user_id");
