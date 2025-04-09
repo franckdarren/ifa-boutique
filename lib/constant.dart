@@ -8,3 +8,6 @@ const registerURL = baseURL + '/users';
 const Color couleurPrimaire = Color(0xFF183356); //Bleu
 const couleurSecondaire = "#83CBCC"; // Turquoise
 const couleurTertiaire = "#F6E824"; // Jaune
+const ventes = Color(0xFF319F43); // Vert (ventes)
+const alertes = Color(0xFFE33629);  // Rouge (alertes)
+
