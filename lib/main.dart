@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
             builder: (context, state) => CreateBoutiquePage()),
         GoRoute(
             path: '/create-article',
-            builder: (context, state) => CreateArticlePage()),
+            builder: (context, state) => ArticleCreatePage()),
         GoRoute(
             path: '/mes-articles',
             builder: (context, state) => MesArticlesPage()),

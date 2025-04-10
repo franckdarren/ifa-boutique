@@ -1,6 +1,6 @@
-import 'dart:convert';
-import '../constant.dart';
 import 'package:dio/dio.dart';
+import '../models/article_model.dart';
+import '../constant.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ArticleService {
@@ -22,22 +22,34 @@ class ArticleService {
     );
   }
 
-  Future<void> createArticle(Map<String, dynamic> articleData) async {
-    try {
-      final response = await _dio.post(
-        '/articles',
-        data: jsonEncode(articleData),
-        options: Options(headers: {'Content-Type': 'application/json'}),
-      );
+  Future<List<ArticleModel>> getArticles() async {
+    final response = await _dio.get('/articles');
+    return (response.data as List)
+        .map((e) => ArticleModel.fromJson(e))
+        .toList();
+  }
 
-      if (response.statusCode == 201 || response.statusCode == 200) {
-        print("Article ajouté avec succès");
-      } else {
-        throw Exception(
-            "Erreur lors de l'ajout de l'article: \${response.statusCode}");
-      }
-    } catch (e) {
-      throw Exception("Erreur lors de l'ajout de l'article: \$e");
-    }
+  Future<ArticleModel> getArticleById(int id) async {
+    final response = await _dio.get('/articles/$id');
+    return ArticleModel.fromJson(response.data);
+  }
+
+  Future<void> createArticle(ArticleModel article) async {
+    await _dio.post('/articles', data: article.toJson());
+  }
+
+  Future<void> updateArticle(int id, ArticleModel article) async {
+    await _dio.put('/articles/$id', data: article.toJson());
+  }
+
+  Future<void> deleteArticle(int id) async {
+    await _dio.delete('/articles/$id');
+  }
+
+  Future<List<ArticleModel>> getArticlesByBoutique(int boutiqueId) async {
+    final response = await _dio.get('/articles-boutique/$boutiqueId');
+    return (response.data as List)
+        .map((e) => ArticleModel.fromJson(e))
+        .toList();
   }
 }
