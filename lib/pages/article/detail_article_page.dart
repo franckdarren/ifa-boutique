@@ -1,50 +1,59 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class DetailsArticlePage extends StatelessWidget {
-  final Map<String, dynamic> article;
-
-  const DetailsArticlePage({super.key, required this.article});
+  const DetailsArticlePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final statut = article['statut'].toLowerCase();
+    final article = GoRouterState.of(context).extra as Map<String, dynamic>;
 
     return Scaffold(
       appBar: AppBar(title: Text(article['nom'])),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Image.asset(
-                article['image'],
-                width: double.infinity,
-                height: 250,
-                fit: BoxFit.contain,
+            Hero(
+              tag: article['nom'],
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.asset(
+                  article['image'],
+                  width: double.infinity,
+                  height: 300,
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             Text(
               article['prix'],
               style: const TextStyle(
-                fontSize: 20,
+                fontSize: 22,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              'Taille : ${article['taille']}',
+              "Taille : ${article['taille']}",
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 8),
             Text(
-              article['statut'],
+              "Statut : ${article['statut']}",
               style: TextStyle(
                 fontSize: 16,
-                color: statut == 'en stock' ? Colors.green : Colors.red,
+                color: article['statut'].toLowerCase() == 'en stock'
+                    ? Colors.green
+                    : Colors.red,
               ),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              "Description de l'article...",
+              style: TextStyle(fontSize: 16),
             ),
           ],
         ),

@@ -43,10 +43,7 @@ class MyApp extends StatelessWidget {
             path: '/mon-profil', builder: (context, state) => MonProfilPage()),
         GoRoute(
           path: '/details',
-          builder: (context, state) {
-            final article = state.extra as Map<String, dynamic>;
-            return DetailsArticlePage(article: article);
-          },
+          builder: (context, state) => const DetailsArticlePage(),
         ),
       ],
     );

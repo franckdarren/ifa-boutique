@@ -76,10 +76,13 @@ class _MesArticlesPageState extends State<MesArticlesPage> {
                     Expanded(
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(10),
-                        child: Image.asset(
-                          article['image'],
-                          width: double.infinity,
-                          fit: BoxFit.cover,
+                        child: Hero(
+                          tag: article['nom'], // Utilise un identifiant unique
+                          child: Image.asset(
+                            article['image'],
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       ),
                     ),
@@ -106,7 +109,7 @@ class _MesArticlesPageState extends State<MesArticlesPage> {
                           article['statut'],
                           style: TextStyle(
                             fontWeight: FontWeight.w500,
-                            color: statut == 'en stock'
+                            color: article['statut'].toLowerCase() == 'en stock'
                                 ? Colors.green
                                 : Colors.red,
                           ),
