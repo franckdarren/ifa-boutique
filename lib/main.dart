@@ -9,6 +9,7 @@ import 'pages/auth/register_page.dart';
 import 'pages/home_page.dart';
 import 'pages/boutique/create_boutique_page.dart';
 import 'pages/article/create_article_page.dart';
+import 'pages/article/detail_article_page.dart';
 import '../../constant.dart';
 
 void main() {
@@ -40,6 +41,13 @@ class MyApp extends StatelessWidget {
             builder: (context, state) => MesCommandesPage()),
         GoRoute(
             path: '/mon-profil', builder: (context, state) => MonProfilPage()),
+        GoRoute(
+          path: '/details',
+          builder: (context, state) {
+            final article = state.extra as Map<String, dynamic>;
+            return DetailsArticlePage(article: article);
+          },
+        ),
       ],
     );
 
