@@ -22,23 +22,21 @@ class ArticleService {
     );
   }
 
-  Future<List<ArticleModel>> getArticles() async {
+  Future<List<Article>> getArticles() async {
     final response = await _dio.get('/articles');
-    return (response.data as List)
-        .map((e) => ArticleModel.fromJson(e))
-        .toList();
+    return (response.data as List).map((e) => Article.fromJson(e)).toList();
   }
 
-  Future<ArticleModel> getArticleById(int id) async {
+  Future<Article> getArticleById(int id) async {
     final response = await _dio.get('/articles/$id');
-    return ArticleModel.fromJson(response.data);
+    return Article.fromJson(response.data);
   }
 
-  Future<void> createArticle(ArticleModel article) async {
+  Future<void> createArticle(Article article) async {
     await _dio.post('/articles', data: article.toJson());
   }
 
-  Future<void> updateArticle(int id, ArticleModel article) async {
+  Future<void> updateArticle(int id, Article article) async {
     await _dio.put('/articles/$id', data: article.toJson());
   }
 
@@ -46,10 +44,8 @@ class ArticleService {
     await _dio.delete('/articles/$id');
   }
 
-  Future<List<ArticleModel>> getArticlesByBoutique(int boutiqueId) async {
+  Future<List<Article>> getArticlesByBoutique(int boutiqueId) async {
     final response = await _dio.get('/articles-boutique/$boutiqueId');
-    return (response.data as List)
-        .map((e) => ArticleModel.fromJson(e))
-        .toList();
+    return (response.data as List).map((e) => Article.fromJson(e)).toList();
   }
 }

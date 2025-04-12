@@ -52,6 +52,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       // Récupérer les données utilisateur
       final String token = response.data['token'];
       final int userId = response.data['user']['id'];
+      final int boutiqueId = response.data['user']['boutique']['id'];
 
       final Map<String, dynamic> userJson = response.data['user'];
       final User user = User.fromJson(userJson);
@@ -59,6 +60,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
       // Stocker le token de manière sécurisée
       await _secureStorage.write(key: "auth_token", value: token);
       await _secureStorage.write(key: "user_id", value: userId.toString());
+      await _secureStorage.write(
+          key: "boutique_id", value: boutiqueId.toString());
 
       // Mettre à jour l'état avec token et userId
       state = AuthState(

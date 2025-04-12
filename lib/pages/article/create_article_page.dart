@@ -1,183 +1,287 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:dio/dio.dart';
 import '../../models/article_model.dart';
 import '../../models/variation_model.dart';
-import '../../services/article_service.dart';
-import '../../providers/article_provider.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../../constant.dart';
 
-class ArticleCreatePage extends ConsumerStatefulWidget {
-  const ArticleCreatePage({super.key});
-
+class ArticleCreatePage extends StatefulWidget {
   @override
-  ConsumerState<ArticleCreatePage> createState() => _ArticleCreatePageState();
+  _ArticleCreatePageState createState() => _ArticleCreatePageState();
 }
 
-class _ArticleCreatePageState extends ConsumerState<ArticleCreatePage> {
-  final _formKey = GlobalKey<FormState>();
+class _ArticleCreatePageState extends State<ArticleCreatePage> {
+  final TextEditingController _nomController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _prixController = TextEditingController();
+  final TextEditingController _prixPromotionController =
+      TextEditingController();
+  final TextEditingController _pourcentageReductionController =
+      TextEditingController();
+  bool _isPromotion = false;
+  final TextEditingController _categorieController = TextEditingController();
 
-  // Champs article
-  final nomController = TextEditingController();
-  final descriptionController = TextEditingController();
-  final prixController = TextEditingController();
-  final prixPromoController = TextEditingController();
-  final pourcentageController = TextEditingController();
+  bool _madeInGabon = false; // Ajout du champ pour "Made in Gabon"
 
-  bool isPromotion = false;
-  bool madeInGabon = false;
+  final List<Variation> variations = [];
+  final FlutterSecureStorage _storage = FlutterSecureStorage();
 
-  int boutiqueId = 1; // Tu peux rendre ça dynamique
-  int sousCategorieId = 1;
-
-  // Variations
-  List<VariationModel> variations = [];
-
-  void addVariationDialog() {
-    final couleurController = TextEditingController();
-    final codeCouleurController = TextEditingController();
-    final tailleController = TextEditingController();
-    final quantiteController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text("Ajouter une variation"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-                controller: couleurController,
-                decoration: InputDecoration(labelText: 'Couleur')),
-            TextField(
-                controller: codeCouleurController,
-                decoration: InputDecoration(labelText: 'Code Couleur')),
-            TextField(
-                controller: tailleController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(labelText: 'Taille')),
-            TextField(
-                controller: quantiteController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(labelText: 'Quantité')),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              if (couleurController.text.isNotEmpty &&
-                  codeCouleurController.text.isNotEmpty &&
-                  tailleController.text.isNotEmpty &&
-                  quantiteController.text.isNotEmpty) {
-                setState(() {
-                  variations.add(VariationModel(
-                    couleur: couleurController.text,
-                    codeCouleur: codeCouleurController.text,
-                    taille: int.parse(tailleController.text),
-                    quantite: int.parse(quantiteController.text),
-                  ));
-                });
-                Navigator.of(context).pop();
-              }
-            },
-            child: const Text("Ajouter"),
-          )
-        ],
-      ),
-    );
+  void _addVariation() {
+    setState(() {
+      variations.add(Variation(
+        couleur: '',
+        taille: '',
+        stock: 0,
+        prix: null,
+      ));
+    });
   }
 
-  void submit() async {
-    if (!_formKey.currentState!.validate()) return;
+  // Méthode pour récupérer le token depuis FlutterSecureStorage
+  Future<String?> _getToken() async {
+    return await _storage.read(
+        key: 'auth_token'); // Remplace 'auth_token' par la clé que tu utilises
+  }
 
-    final article = ArticleModel(
-      nom: nomController.text,
-      description: descriptionController.text,
-      prix: int.parse(prixController.text),
-      prixPromotion: prixPromoController.text.isNotEmpty
-          ? int.parse(prixPromoController.text)
-          : null,
-      isPromotion: isPromotion,
-      pourcentageReduction: pourcentageController.text.isNotEmpty
-          ? int.parse(pourcentageController.text)
-          : null,
-      madeInGabon: madeInGabon,
-      boutiqueId: boutiqueId,
-      sousCategorieId: sousCategorieId,
-      variations: variations,
-    );
+  // Méthode pour récupérer le token depuis FlutterSecureStorage
+  Future<String?> _getBoutiqueId() async {
+    return await _storage.read(
+        key: 'boutique_id'); // Remplace 'auth_token' par la clé que tu utilises
+  }
+
+  // Méthode pour soumettre l'article avec ses variations
+  void _submitArticle() async {
+    if (_nomController.text.isEmpty ||
+        _prixController.text.isEmpty ||
+        _categorieController
+            .text.isEmpty || // Assurez-vous que la catégorie est remplie
+        variations.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Veuillez remplir tous les champs')));
+      return;
+    }
 
     try {
-      await ref.read(articleServiceProvider).createArticle(article);
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Article créé !')));
-      Navigator.pop(context);
+      final token = await _getToken(); // Récupérer le token
+      final boutique_id = await _getBoutiqueId();
+
+      final article = Article(
+        nom: _nomController.text,
+        description: _descriptionController.text,
+        prix: int.parse(_prixController.text),
+        categorie: _categorieController
+            .text, // La catégorie est maintenant correctement définie
+        variations: variations,
+        boutiqueId: int.parse(boutique_id!),
+        prixPromotion:
+            _isPromotion ? int.tryParse(_prixPromotionController.text) ?? 0 : 0,
+        pourcentageReduction: int.tryParse(_prixPromotionController.text) ?? 0,
+        isPromotion: _isPromotion,
+        madeInGabon: _madeInGabon, // Ajout du champ madeInGabon
+      );
+
+      if (token == null) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('Token non trouvé, veuillez vous reconnecter')));
+        return;
+      }
+
+      // print('Token: $token'); // Afficher le token
+      // print('Catégorie saisie: ${_categorieController.text}');
+      // print(
+      // 'Article Data: ${article.toJson()}'); // Afficher les données de l'article
+
+      final response = await Dio().post(
+        '$baseURL/articles',
+        data: article.toJson(),
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token', // Ajouter le token dans l'en-tête
+          },
+        ),
+      );
+
+      if (response.statusCode == 201) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Article créé avec succès')));
+
+        // Réinitialisation des champs texte
+        _nomController.clear();
+        _descriptionController.clear();
+        _prixController.clear();
+        _prixPromotionController.clear();
+        _pourcentageReductionController.clear();
+        _categorieController.clear();
+
+        // Réinitialisation de l'état des cases à cocher et des listes
+        setState(() {
+          _isPromotion = false;
+          _madeInGabon = false;
+          variations.clear();
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content:
+                Text('Erreur lors de la création: ${response.statusCode}')));
+      }
     } catch (e) {
-      print(e);
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Erreur : $e')));
+      if (e is DioError) {
+        // DioError fournit des informations détaillées sur l'erreur
+        // print('DioError: ${e.response?.data}');
+        // print('DioError message: ${e.message}');
+        // print('DioError type: ${e.type}');
+        // print('DioError status code: ${e.response?.statusCode}');
+
+        // Afficher l'erreur dans le Snackbar
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Erreur de connexion: ${e.message}')));
+      } else {
+        // Si ce n'est pas une DioError, afficher l'erreur générique
+        print('Erreur inconnue: $e');
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Erreur de connexion')));
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Créer un article')),
+      appBar: AppBar(title: Text('Créer un Article')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
+        child: SingleChildScrollView(
+          child: Column(
             children: [
-              TextFormField(
-                  controller: nomController,
-                  decoration: const InputDecoration(labelText: 'Nom'),
-                  validator: (v) => v!.isEmpty ? 'Requis' : null),
-              TextFormField(
-                  controller: descriptionController,
-                  decoration: const InputDecoration(labelText: 'Description'),
-                  validator: (v) => v!.isEmpty ? 'Requis' : null),
-              TextFormField(
-                  controller: prixController,
-                  decoration: const InputDecoration(labelText: 'Prix'),
+              TextField(
+                controller: _nomController,
+                decoration: InputDecoration(labelText: 'Nom de l\'article'),
+              ),
+              TextField(
+                controller: _descriptionController,
+                decoration: InputDecoration(labelText: 'Description'),
+                maxLines: 3,
+              ),
+              TextField(
+                controller: _prixController,
+                decoration: InputDecoration(labelText: 'Prix'),
+                keyboardType: TextInputType.number,
+              ),
+              Text('En promotion'),
+              Checkbox(
+                value: _isPromotion,
+                onChanged: (bool? value) {
+                  setState(() {
+                    _isPromotion = value!;
+                  });
+                },
+              ),
+              // Champ prix promotion
+              if (_isPromotion)
+                TextFormField(
+                  controller: _prixPromotionController,
+                  decoration: InputDecoration(labelText: 'Prix promotionnel'),
                   keyboardType: TextInputType.number,
-                  validator: (v) => v!.isEmpty ? 'Requis' : null),
-              TextFormField(
-                  controller: prixPromoController,
-                  decoration: const InputDecoration(labelText: 'Prix Promo'),
-                  keyboardType: TextInputType.number),
-              TextFormField(
-                  controller: pourcentageController,
-                  decoration: const InputDecoration(labelText: 'Réduction (%)'),
-                  keyboardType: TextInputType.number),
-              SwitchListTile(
-                title: const Text("Promotion"),
-                value: isPromotion,
-                onChanged: (val) => setState(() => isPromotion = val),
-              ),
-              SwitchListTile(
-                title: const Text("Fabriqué au Gabon"),
-                value: madeInGabon,
-                onChanged: (val) => setState(() => madeInGabon = val),
-              ),
-              const SizedBox(height: 20),
-              const Text("Variations",
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-              for (var v in variations)
-                ListTile(
-                  title: Text('${v.couleur} | ${v.taille} | ${v.quantite}'),
-                  subtitle: Text('Code couleur : ${v.codeCouleur}'),
                 ),
-              TextButton.icon(
-                onPressed: addVariationDialog,
-                icon: const Icon(Icons.add),
-                label: const Text("Ajouter une variation"),
+              // Champ pourcentage réduction
+              if (_isPromotion)
+                TextFormField(
+                  controller: _pourcentageReductionController,
+                  decoration:
+                      InputDecoration(labelText: 'Pourcentage de réduction'),
+                  keyboardType: TextInputType.number,
+                ),
+              TextField(
+                controller: _categorieController,
+                decoration: InputDecoration(labelText: 'Catégorie'),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20),
+              // Ajout du champ pour "Made in Gabon"
+              Row(
+                children: [
+                  Checkbox(
+                    value: _madeInGabon,
+                    onChanged: (bool? value) {
+                      setState(() {
+                        _madeInGabon = value!;
+                      });
+                    },
+                  ),
+                  Text('Fabriqué au Gabon')
+                ],
+              ),
+              SizedBox(height: 20),
+              ...variations
+                  .map((variation) => _buildVariationForm(variation))
+                  .toList(),
+              SizedBox(height: 20),
               ElevatedButton(
-                onPressed: submit,
-                child: const Text("Enregistrer l'article"),
+                onPressed: _addVariation,
+                child: Text('Ajouter une Variation'),
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _submitArticle,
+                child: Text('Soumettre l\'article'),
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildVariationForm(Variation variation) {
+    final index = variations.indexOf(variation);
+    return Card(
+      margin: EdgeInsets.symmetric(vertical: 10),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            TextField(
+              onChanged: (value) {
+                setState(() {
+                  variation.couleur = value;
+                });
+              },
+              decoration: InputDecoration(labelText: 'Couleur'),
+            ),
+            TextField(
+              onChanged: (value) {
+                setState(() {
+                  variation.taille = value;
+                });
+              },
+              decoration: InputDecoration(labelText: 'Taille'),
+            ),
+            TextField(
+              onChanged: (value) {
+                setState(() {
+                  variation.stock = int.parse(value);
+                });
+              },
+              decoration: InputDecoration(labelText: 'Stock'),
+              keyboardType: TextInputType.number,
+            ),
+            TextField(
+              onChanged: (value) {
+                setState(() {
+                  variation.prix = value.isNotEmpty ? int.parse(value) : null;
+                });
+              },
+              decoration: InputDecoration(labelText: 'Prix'),
+              keyboardType: TextInputType.number,
+            ),
+            IconButton(
+              icon: Icon(Icons.remove_circle),
+              onPressed: () {
+                setState(() {
+                  variations.removeAt(index);
+                });
+              },
+            ),
+          ],
         ),
       ),
     );

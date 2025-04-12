@@ -133,7 +133,7 @@ class _CreateBoutiquePageState extends ConsumerState<CreateBoutiquePage> {
           .addBoutique(boutique, _selectedImage!)
           .then((_) {
         // Boutique créée avec succès, redirection vers la page d'accueil
-        context.go('/home');
+        context.go('/login');
       }).catchError((error) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

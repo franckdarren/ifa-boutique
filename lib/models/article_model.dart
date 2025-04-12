@@ -1,60 +1,42 @@
 import 'variation_model.dart';
 
-class ArticleModel {
-  final int? id;
-  final String nom;
-  final String description;
-  final int prix;
-  final int? prixPromotion;
-  final bool isPromotion;
-  final int? pourcentageReduction;
-  final int boutiqueId;
-  final int sousCategorieId;
-  final bool madeInGabon;
-  final List<VariationModel> variations;
+class Article {
+  String nom;
+  String description;
+  int prix;
+  int boutiqueId;
+  int prixPromotion;
+  int pourcentageReduction;
+  bool isPromotion;
+  String categorie;
+  bool madeInGabon;
 
-  ArticleModel({
-    this.id,
+  List<Variation> variations;
+
+  Article({
     required this.nom,
     required this.description,
     required this.prix,
-    this.prixPromotion,
-    required this.isPromotion,
-    this.pourcentageReduction,
     required this.boutiqueId,
-    required this.sousCategorieId,
-    required this.madeInGabon,
+    required this.prixPromotion,
+    required this.pourcentageReduction,
+    required this.isPromotion,
+    required this.categorie,
     required this.variations,
+    required this.madeInGabon,
   });
 
-  factory ArticleModel.fromJson(Map<String, dynamic> json) {
-    return ArticleModel(
-      id: json['id'],
-      nom: json['nom'],
-      description: json['description'],
-      prix: json['prix'],
-      prixPromotion: json['prix_promotion'],
-      isPromotion: json['is_promotion'] ?? false,
-      pourcentageReduction: json['pourcentageReduction'],
-      boutiqueId: json['boutique_id'],
-      sousCategorieId: json['sous_categorie_id'],
-      madeInGabon: json['madeInGabon'] ?? false,
-      variations: (json['variations'] as List)
-          .map((v) => VariationModel.fromJson(v))
-          .toList(),
-    );
-  }
-
+  // Méthode pour convertir l'objet Article en Map pour l'API
   Map<String, dynamic> toJson() {
     return {
       'nom': nom,
       'description': description,
       'prix': prix,
-      'prix_promotion': prixPromotion,
-      'is_promotion': isPromotion,
+      'prixPromotion': prixPromotion,
       'pourcentageReduction': pourcentageReduction,
+      'isPromotion': isPromotion,
       'boutique_id': boutiqueId,
-      'sous_categorie_id': sousCategorieId,
+      'categorie': categorie,
       'madeInGabon': madeInGabon,
       'variations': variations.map((v) => v.toJson()).toList(),
     };

@@ -1,31 +1,23 @@
-class VariationModel {
-  final String couleur;
-  final String codeCouleur;
-  final int taille;
-  final int quantite;
+class Variation {
+  String couleur;
+  String taille;
+  int stock;
+  int? prix; // Prix nullable, peut être null si non spécifié
 
-  VariationModel({
+  Variation({
     required this.couleur,
-    required this.codeCouleur,
     required this.taille,
-    required this.quantite,
+    required this.stock,
+    this.prix,
   });
 
-  factory VariationModel.fromJson(Map<String, dynamic> json) {
-    return VariationModel(
-      couleur: json['couleur'],
-      codeCouleur: json['code_couleur'],
-      taille: json['taille'],
-      quantite: json['stock']['quantite'], // attention à la structure du JSON
-    );
-  }
-
+  // Méthode pour convertir l'objet Variation en Map pour l'API
   Map<String, dynamic> toJson() {
     return {
       'couleur': couleur,
-      'code_couleur': codeCouleur,
       'taille': taille,
-      'quantite': quantite,
+      'stock': stock,
+      'prix': prix,
     };
   }
 }
