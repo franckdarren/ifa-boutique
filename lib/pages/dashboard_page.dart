@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../constant.dart';
@@ -13,6 +14,32 @@ class DashboardPage extends ConsumerStatefulWidget {
 }
 
 class _DashboardPageState extends ConsumerState<DashboardPage> {
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    // Après le premier build, lancer le timer
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Assurez-vous que l'utilisateur est déjà chargé
+      final authState = ref.read(authProvider);
+      final user = authState.user;
+      if (user != null) {
+        _timer = Timer.periodic(Duration(seconds: 10), (_) {
+          // Rafraîchir le dashboardProvider automatiquement
+          ref.refresh(dashboardProvider(user.id));
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    // Annuler le timer lors de la destruction du widget
+    _timer?.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
@@ -35,7 +62,6 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
         child: Column(
           children: [
             const SizedBox(height: 20),
-
             // Solde de la boutique
             Container(
               height: 100,
@@ -68,9 +94,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                 ],
               ),
             ),
-
             const SizedBox(height: 20),
-
             // Statistiques dynamiques
             dashboardStats.when(
               data: (stats) {
@@ -88,7 +112,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                     Expanded(
                       child: InfoBox(
                         title: 'Ventes',
-                        number: '0', // À mettre à jour quand disponible
+                        number: '0', // Mettre à jour quand disponible
                         textColor: ventes,
                         borderColor: ventes,
                       ),
@@ -97,7 +121,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                     Expanded(
                       child: InfoBox(
                         title: 'Alertes',
-                        number: '0', // À mettre à jour quand disponible
+                        number: '0', // Mettre à jour quand disponible
                         textColor: alertes,
                         borderColor: alertes,
                       ),
