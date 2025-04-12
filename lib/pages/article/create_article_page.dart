@@ -18,14 +18,18 @@ class _ArticleCreatePageState extends State<ArticleCreatePage> {
       TextEditingController();
   final TextEditingController _pourcentageReductionController =
       TextEditingController();
-  bool _isPromotion = false;
-  final TextEditingController _categorieController = TextEditingController();
 
-  bool _madeInGabon = false; // Ajout du champ pour "Made in Gabon"
+  bool _isPromotion = false;
+  bool _madeInGabon = false; // Champ pour "Made in Gabon"
 
   final List<Variation> variations = [];
   final FlutterSecureStorage _storage = FlutterSecureStorage();
 
+  // Liste des catégories disponibles et variable pour la sélection
+  List<String> categories = ['Vêtements', 'Électronique', 'Maison', 'Sports'];
+  String? _selectedCategory;
+
+  // Ajoute une variation
   void _addVariation() {
     setState(() {
       variations.add(Variation(
@@ -39,22 +43,19 @@ class _ArticleCreatePageState extends State<ArticleCreatePage> {
 
   // Méthode pour récupérer le token depuis FlutterSecureStorage
   Future<String?> _getToken() async {
-    return await _storage.read(
-        key: 'auth_token'); // Remplace 'auth_token' par la clé que tu utilises
+    return await _storage.read(key: 'auth_token');
   }
 
-  // Méthode pour récupérer le token depuis FlutterSecureStorage
+  // Méthode pour récupérer l'id de boutique depuis FlutterSecureStorage
   Future<String?> _getBoutiqueId() async {
-    return await _storage.read(
-        key: 'boutique_id'); // Remplace 'auth_token' par la clé que tu utilises
+    return await _storage.read(key: 'boutique_id');
   }
 
   // Méthode pour soumettre l'article avec ses variations
   void _submitArticle() async {
     if (_nomController.text.isEmpty ||
         _prixController.text.isEmpty ||
-        _categorieController
-            .text.isEmpty || // Assurez-vous que la catégorie est remplie
+        _selectedCategory == null ||
         variations.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Veuillez remplir tous les champs')));
@@ -69,15 +70,18 @@ class _ArticleCreatePageState extends State<ArticleCreatePage> {
         nom: _nomController.text,
         description: _descriptionController.text,
         prix: int.parse(_prixController.text),
-        categorie: _categorieController
-            .text, // La catégorie est maintenant correctement définie
+        categorie:
+            _selectedCategory!, // Utilisation de la catégorie sélectionnée
         variations: variations,
         boutiqueId: int.parse(boutique_id!),
         prixPromotion:
             _isPromotion ? int.tryParse(_prixPromotionController.text) ?? 0 : 0,
-        pourcentageReduction: int.tryParse(_prixPromotionController.text) ?? 0,
+        // Correction : Utilisation du controller pour le pourcentage de réduction
+        pourcentageReduction: _isPromotion
+            ? int.tryParse(_pourcentageReductionController.text) ?? 0
+            : 0,
         isPromotion: _isPromotion,
-        madeInGabon: _madeInGabon, // Ajout du champ madeInGabon
+        madeInGabon: _madeInGabon,
       );
 
       if (token == null) {
@@ -86,17 +90,12 @@ class _ArticleCreatePageState extends State<ArticleCreatePage> {
         return;
       }
 
-      // print('Token: $token'); // Afficher le token
-      // print('Catégorie saisie: ${_categorieController.text}');
-      // print(
-      // 'Article Data: ${article.toJson()}'); // Afficher les données de l'article
-
       final response = await Dio().post(
         '$baseURL/articles',
         data: article.toJson(),
         options: Options(
           headers: {
-            'Authorization': 'Bearer $token', // Ajouter le token dans l'en-tête
+            'Authorization': 'Bearer $token', // Ajout du token dans l'en-tête
           },
         ),
       );
@@ -111,12 +110,12 @@ class _ArticleCreatePageState extends State<ArticleCreatePage> {
         _prixController.clear();
         _prixPromotionController.clear();
         _pourcentageReductionController.clear();
-        _categorieController.clear();
 
-        // Réinitialisation de l'état des cases à cocher et des listes
+        // Réinitialisation des cases à cocher, du dropdown et des variations
         setState(() {
           _isPromotion = false;
           _madeInGabon = false;
+          _selectedCategory = null;
           variations.clear();
         });
       } else {
@@ -126,17 +125,9 @@ class _ArticleCreatePageState extends State<ArticleCreatePage> {
       }
     } catch (e) {
       if (e is DioError) {
-        // DioError fournit des informations détaillées sur l'erreur
-        // print('DioError: ${e.response?.data}');
-        // print('DioError message: ${e.message}');
-        // print('DioError type: ${e.type}');
-        // print('DioError status code: ${e.response?.statusCode}');
-
-        // Afficher l'erreur dans le Snackbar
         ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Erreur de connexion: ${e.message}')));
       } else {
-        // Si ce n'est pas une DioError, afficher l'erreur générique
         print('Erreur inconnue: $e');
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Erreur de connexion')));
@@ -155,18 +146,30 @@ class _ArticleCreatePageState extends State<ArticleCreatePage> {
             children: [
               TextField(
                 controller: _nomController,
-                decoration: InputDecoration(labelText: 'Nom de l\'article'),
+                decoration: InputDecoration(
+                  labelText: 'Nom de l\'article',
+                  border: OutlineInputBorder(),
+                ),
               ),
+              const SizedBox(height: 20),
               TextField(
                 controller: _descriptionController,
-                decoration: InputDecoration(labelText: 'Description'),
+                decoration: InputDecoration(
+                  labelText: 'Description',
+                  border: OutlineInputBorder(),
+                ),
                 maxLines: 3,
               ),
+              const SizedBox(height: 20),
               TextField(
                 controller: _prixController,
-                decoration: InputDecoration(labelText: 'Prix'),
+                decoration: InputDecoration(
+                  labelText: 'Prix',
+                  border: OutlineInputBorder(),
+                ),
                 keyboardType: TextInputType.number,
               ),
+              const SizedBox(height: 20),
               Text('En promotion'),
               Checkbox(
                 value: _isPromotion,
@@ -176,27 +179,48 @@ class _ArticleCreatePageState extends State<ArticleCreatePage> {
                   });
                 },
               ),
-              // Champ prix promotion
               if (_isPromotion)
                 TextFormField(
                   controller: _prixPromotionController,
-                  decoration: InputDecoration(labelText: 'Prix promotionnel'),
+                  decoration: InputDecoration(
+                    labelText: 'Prix promotionnel',
+                    border: OutlineInputBorder(),
+                  ),
                   keyboardType: TextInputType.number,
                 ),
-              // Champ pourcentage réduction
+              const SizedBox(height: 20),
               if (_isPromotion)
                 TextFormField(
                   controller: _pourcentageReductionController,
-                  decoration:
-                      InputDecoration(labelText: 'Pourcentage de réduction'),
+                  decoration: InputDecoration(
+                    labelText: 'Pourcentage de réduction',
+                    border: OutlineInputBorder(),
+                  ),
                   keyboardType: TextInputType.number,
                 ),
-              TextField(
-                controller: _categorieController,
-                decoration: InputDecoration(labelText: 'Catégorie'),
+              const SizedBox(height: 20),
+              DropdownButtonFormField<String>(
+                value: _selectedCategory,
+                decoration: InputDecoration(
+                  labelText: 'Catégorie',
+                  border: OutlineInputBorder(),
+                ),
+                items: categories.map((String category) {
+                  return DropdownMenuItem<String>(
+                    value: category,
+                    child: Text(category),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _selectedCategory = newValue;
+                  });
+                },
+                validator: (value) => value == null
+                    ? 'Veuillez sélectionner une catégorie'
+                    : null,
               ),
-              SizedBox(height: 20),
-              // Ajout du champ pour "Made in Gabon"
+              const SizedBox(height: 20),
               Row(
                 children: [
                   Checkbox(
@@ -210,19 +234,28 @@ class _ArticleCreatePageState extends State<ArticleCreatePage> {
                   Text('Fabriqué au Gabon')
                 ],
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               ...variations
                   .map((variation) => _buildVariationForm(variation))
                   .toList(),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _addVariation,
                 child: Text('Ajouter une Variation'),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _submitArticle,
                 child: Text('Soumettre l\'article'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: couleurPrimaire,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: EdgeInsets.symmetric(vertical: 15),
+                  minimumSize: Size(double.infinity, 50),
+                ),
               ),
             ],
           ),
@@ -234,7 +267,7 @@ class _ArticleCreatePageState extends State<ArticleCreatePage> {
   Widget _buildVariationForm(Variation variation) {
     final index = variations.indexOf(variation);
     return Card(
-      margin: EdgeInsets.symmetric(vertical: 10),
+      margin: const EdgeInsets.symmetric(vertical: 10),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(

@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../providers/boutique_provider.dart';
 import '../../models/boutique_model.dart';
+import '../../constant.dart';
 
 class CreateBoutiquePage extends ConsumerStatefulWidget {
   const CreateBoutiquePage({Key? key}) : super(key: key);
@@ -262,6 +263,16 @@ class _CreateBoutiquePageState extends ConsumerState<CreateBoutiquePage> {
                               color: Colors.white,
                             )
                           : const Text('Créer la boutique'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: couleurPrimaire,
+                        foregroundColor:
+                            Colors.white, // 🔵 couleur du texte / icône
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12), // 🎯 arrondi
+                        ),
+                        padding: EdgeInsets.symmetric(vertical: 15),
+                        minimumSize: Size(double.infinity, 50),
+                      ),
                     ),
                   ],
                 ),
